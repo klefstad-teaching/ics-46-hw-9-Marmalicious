@@ -6,39 +6,29 @@ void error(string word1, string word2, string msg) {
 }
 
 bool edit_distance_within(const std::string& str1, const std::string& str2, int d) {
-    while (str1[d] != '\0' && str2[d] != '\0') {
-        if (str1[d] != str2[d]) {
-            // Substitution
-            if (str1[d + 1] == str2[d + 1]) {
-                ++d;
-                while (str1[d] != '\0' && str2[d] != '\0') {
-                    if (str1[d] != str2[d]) return false;
-                    ++d;
-                }
-            }
-            // Removal
-            else if (str1[d + 1] == str2[d]) {
-                while (str1[d + 1] != '\0' && str2[d] != '\0') {
-                    if (str1[d + 1] != str2[d]) return false;
-                    ++d;
-                }
-            }
-            // Insertion
-            else if (str1[d] == str2[d + 1]) {
-                while (str1[d] != '\0' && str2[d + 1] != '\0') {
-                    if (str1[d] != str2[d + 1]) return false;
-                    ++d;
-                }
-            }
-            else return false;
+    int len1 = str1.size();
+    int len2 = str2.size();
+    int i = 0, j = 0, edits = 0;
+
+    while (i < len1 && j < len2) {
+        if (str1[i] != str2[j]) {
+            edits++;
+            if (edits > d) return false;
+            // substitution
+            if (i + 1 < len1 && j + 1 < len2 && str1[i + 1] == str2[j + 1]) { i++, j++; }
+            // deletion
+            else if (i + 1 < len1 && str1[i + 1] == str2[j]) i++;
+            // insertion
+            else if (j + 1 < len2 && str1[i] == str2[j + 1]) j++;
         }
-        ++d;
+        i++, j++;
     }
-    return true;
+    edits += abs(len1 - i - (len2 - j));
+    return edits <= d;
 }
 
 bool is_adjacent(const string& word1, const string& word2) {
-    return edit_distance_within(word1, word2, 0);
+    return edit_distance_within(word1, word2, 1);
 }
 
 vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list) {
