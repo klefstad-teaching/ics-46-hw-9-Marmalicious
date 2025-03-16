@@ -6,29 +6,39 @@ void error(string word1, string word2, string msg) {
 }
 
 bool edit_distance_within(const std::string& str1, const std::string& str2, int d) {
-    int s1 = str1.size() + 1;
-    int s2 = str2.size() + 1;
-    vector<vector<int>> matrix(s1, vector<int>(s2));
-    for (int i = 1; i < s1; ++i)
-        matrix[i][0] = i;
-    for (int i = 1; i < s2; ++i)
-        matrix[0][i] = i;
-    for (int i = 1; i < s1; ++i) {
-        for (int j = 1; j < s2; ++j) {
-            int sub;
-            if (str1[i - 1] == str2[j - 1])
-                sub = 0;
-            else
-                sub = 1;
-            int hold = min(matrix[i-1][j] + 1, matrix[i][j-1] + 1);
-            matrix[i][j] = min(hold, matrix[i-1][j-1] + sub);
+    while (str1[d] != '\0' && str2[d] != '\0') {
+        if (str1[d] != str2[d]) {
+            // Substitution
+            if (str1[d + 1] == str2[d + 1]) {
+                ++d;
+                while (str1[d] != '\0' && str2[d] != '\0') {
+                    if (str1[d] != str2[d]) return false;
+                    ++d;
+                }
+            }
+            // Removal
+            else if (str1[d + 1] == str2[d]) {
+                while (str1[d + 1] != '\0' && str2[d] != '\0') {
+                    if (str1[d + 1] != str2[d]) return false;
+                    ++d;
+                }
+            }
+            // Insertion
+            else if (str1[d] == str2[d + 1]) {
+                while (str1[d] != '\0' && str2[d + 1] != '\0') {
+                    if (str1[d] != str2[d + 1]) return false;
+                    ++d;
+                }
+            }
+            else return false;
         }
+        ++d;
     }
-    return matrix[s1 - 1][s2 - 1] == d;
+    return true;
 }
 
 bool is_adjacent(const string& word1, const string& word2) {
-    return edit_distance_within(word1, word2, 1);
+    return edit_distance_within(word1, word2, 0);
 }
 
 vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list) {
@@ -51,11 +61,12 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
                     visited.push_back(s);
                     vector<string> copy = temp;
                     copy.push_back(s);
-                    if (s == end_word) { temp = copy; break; };
+                    if (s == end_word) return copy;
                     q.push(copy);
                 }
             }
-    } 
+    }
+    temp.assign(0, "");
     return temp;
 }
 
@@ -72,9 +83,13 @@ void load_words(set<string> & word_list, const string& file_name) {
 }
 
 void print_word_ladder(const vector<string>& ladder) {
+    if (ladder.size() < 2) {
+        cout << "No word ladder found.";
+    }
     for (string s : ladder) {
         cout << s << " ";
     }
+    cout << endl;
 }
 
 #define my_assert(e) {cout << #e << ((e) ? " passed": " failed") << endl;}
