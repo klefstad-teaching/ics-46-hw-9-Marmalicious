@@ -15,14 +15,21 @@ bool edit_distance_within(const std::string& str1, const std::string& str2, int 
         if (str1[i] != str2[j]) {
             edits++;
             if (edits > d) return false;
+            // account for double characters (ee)
+            /*if (i + 1 < len1 && j + 1 < len2 && (str1[i] == str2[i + 1] || str1[j] == str2[j + 1])) {
+                if (str1[i] == str1[i + 1] && str2[j] == str2[j + 1]) { ++i; ++j; }
+                else if (str1[i] == str1[i + 1]) ++j;
+                else ++i;
+            }*/
             // deletion
-            else if (i + 1 < len1 && str1[i + 1] == str2[j]) i++;
+            else if (i + 1 < len1 && str1[i + 1] == str2[j]) ++i;
             // insertion
-            else if (j + 1 < len2 && str1[i] == str2[j + 1]) j++;
+            else if (j + 1 < len2 && str1[i] == str2[j + 1]) ++j;
             // substitution
-            else if (i + 1 < len1 && j + 1 < len2 && str1[i + 1] == str2[j + 1]) { i++, j++; }
+            else if (i + 1 < len1 && j + 1 < len2 && str1[i + 1] == str2[j + 1]) { ++i, ++j; }
         }
-        i++, j++;
+        ++i;
+        ++j;
     }
     edits += abs(len1 - i - (len2 - j));
     return edits <= d;
@@ -76,8 +83,9 @@ void load_words(set<string> & word_list, const string& file_name) {
 void print_word_ladder(const vector<string>& ladder) {
     if (ladder.size() < 2) {
         cout << "No word ladder found.";
+    } else {
+        cout << "Word ladder found: ";
     }
-    cout << "Word ladder found: ";
     for (string s : ladder) {
         cout << s << " ";
     }
@@ -94,4 +102,5 @@ void verify_word_ladder() {
     my_assert(generate_word_ladder("work", "play", word_list).size() == 6);
     my_assert(generate_word_ladder("sleep", "awake", word_list).size() == 8);
     my_assert(generate_word_ladder("car", "cheat", word_list).size() == 4);
+    cout << endl;
 }
