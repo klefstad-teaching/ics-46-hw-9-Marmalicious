@@ -50,10 +50,10 @@ vector<string> generate_word_ladder(const string& begin_word, const string& end_
                     if (s == v) { found = 1; break; }
                 if (!found) {
                     visited.push_back(s);
-                    vector<string> copy = temp;
-                    copy.push_back(s);
-                    if (s == end_word) return copy;
-                    q.push(copy);
+                    temp.push_back(s);
+                    if (s == end_word) return temp;
+                    q.push(temp);
+                    temp.pop_back();
                 }
             }
     }
@@ -77,6 +77,7 @@ void print_word_ladder(const vector<string>& ladder) {
     if (ladder.size() < 2) {
         cout << "No word ladder found.";
     }
+    cout << "Word ladder found: ";
     for (string s : ladder) {
         cout << s << " ";
     }
