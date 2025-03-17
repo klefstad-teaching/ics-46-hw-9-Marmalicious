@@ -15,12 +15,12 @@ bool edit_distance_within(const std::string& str1, const std::string& str2, int 
         if (str1[i] != str2[j]) {
             edits++;
             if (edits > d) return false;
-            // substitution
-            if (i + 1 < len1 && j + 1 < len2 && str1[i + 1] == str2[j + 1]) { i++, j++; }
             // deletion
-            else if (i + 1 < len1 && str1[i + 1] == str2[j]) i++;
+            if (i + 1 < len1 && str1[i + 1] == str2[j]) i++;
             // insertion
             else if (j + 1 < len2 && str1[i] == str2[j + 1]) j++;
+            // substitution
+            else if (i + 1 < len1 && j + 1 < len2 && str1[i + 1] == str2[j + 1]) { i++, j++; }
         }
         i++, j++;
     }
